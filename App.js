@@ -8,10 +8,9 @@ import {
   KeyboardAvoidingView,
   SafeAreaView,
 } from "react-native";
-
+import { LinearGradient } from "expo-linear-gradient";
 import { FlatGrid } from "react-native-super-grid";
 import { useFonts, Abel_400Regular } from "@expo-google-fonts/abel";
-
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { dataStuff } from "./utils/apiFetch";
@@ -20,8 +19,10 @@ export default function App() {
   const [data, setData] = useState([]);
   const [rapper, setRapper] = useState("drake");
   const [switchFlip, setSwitchFlip] = useState(true);
+
   let [loaded] = useFonts({
-    Abel_400Regular,
+    // Abel_400Regular,
+    Abel: require("./fonts/Abel-Regular.ttf"),
   });
 
   var options = {
@@ -35,15 +36,15 @@ export default function App() {
   };
 
   useEffect(() => {
-    // setData(dataStuff);
-    axios
-      .request(options)
-      .then(function (response) {
-        setData(response.data.response.hits);
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
+    setData(dataStuff);
+    // axios
+    //   .request(options)
+    //   .then(function (response) {
+    //     setData(response.data.response.hits);
+    //   })
+    //   .catch(function (error) {
+    //     console.error(error);
+    //   });
   }, [switchFlip]);
 
   // rerun api pull
@@ -62,16 +63,18 @@ export default function App() {
       <SafeAreaView style={styles.container}>
         <Text
           style={{
-            fontFamily: "Abel_400Regular",
-            fontSize: 30,
-            marginTop: -10,
+            fontFamily: "Abel",
+            fontSize: 32,
+            marginTop: 20,
+            marginBottom: 20,
           }}
         >
           {artistName}
         </Text>
+
         <View
           style={{
-            maxHeight: Dimensions.get("window").height * 0.7,
+            maxHeight: Dimensions.get("window").height * 0.72,
             width: Dimensions.get("window").width,
             flexDirection: "row",
           }}
@@ -81,11 +84,70 @@ export default function App() {
             data={data}
             spacing={0}
             fixed
-            style={styles.gridView}
-            renderItem={({ item }) => {
-              let randomColor = Math.floor(Math.random() * 16777215).toString(
-                16
-              );
+            style={[styles.gridView, {}]}
+            renderItem={({ item, index }) => {
+              // randomColor
+              const randomColor = `#${Math.floor(
+                Math.random() * 16777215
+              ).toString(16)}`;
+
+              // randomColorFix //
+
+              const randomColorFix =
+                randomColor.length === 6
+                  ? `${randomColor}5`
+                  : randomColor.length === 5
+                  ? `${randomColor}55`
+                  : randomColor;
+              // console.log(randomColorFix.slice(0, -1).length);
+
+              // invertColor //
+
+              function invertColor(hex) {
+                if (hex.indexOf("#") === 0) {
+                  hex = hex.slice(1);
+                }
+                // convert 3-digit hex to 6-digits.
+                if (hex.length === 3) {
+                  hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+                }
+                if (hex.length !== 6) {
+                  console.warn("o well", hex);
+                }
+                // invert color components
+                var r = (255 - parseInt(hex.slice(0, 2), 16)).toString(16),
+                  g = (255 - parseInt(hex.slice(2, 4), 16)).toString(16),
+                  b = (255 - parseInt(hex.slice(4, 6), 16)).toString(16);
+                // pad each with zeros and return
+                return "#" + padZero(r) + padZero(g) + padZero(b);
+              }
+
+              function padZero(str, len) {
+                len = len || 2;
+                var zeros = new Array(len).join("0");
+                return (zeros + str).slice(-len);
+              }
+              const frameColor = invertColor(randomColorFix);
+
+              var getContrast = function (hexcolor) {
+                // If a leading # is provided, remove it
+                if (hexcolor.slice(0, 1) === "#") {
+                  hexcolor = hexcolor.slice(1);
+                }
+
+                // Convert to RGB value
+                var r = parseInt(hexcolor.substr(0, 2), 16);
+                var g = parseInt(hexcolor.substr(2, 2), 16);
+                var b = parseInt(hexcolor.substr(4, 2), 16);
+
+                // Get YIQ ratio
+                var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+
+                // Check contrast
+                return yiq >= 128 ? "black" : "white";
+              };
+
+              const textColor = getContrast(randomColorFix);
 
               return (
                 <View
@@ -94,23 +156,44 @@ export default function App() {
                     alignItems: "center",
                     borderRadius: 5,
                     width: 180,
-                    height: 200,
-                    backgroundColor: `#${randomColor}`,
+                    height: 210,
+                    backgroundColor: randomColor,
                     marginTop: 19,
+                    shadowColor: frameColor,
+                    shadowOffset: { width: -2, height: 4 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 3,
                   }}
                 >
-                  <Image
-                    source={{
-                      uri: item.result.header_image_url,
+                  <View
+                    style={{
+                      height: 130,
+                      width: 130,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: textColor,
+                      borderRadius: 10,
+                      shadowColor: textColor,
+                      shadowOffset: { width: -2, height: 4 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 3,
                     }}
-                    style={styles.imageStyle}
-                  />
+                  >
+                    <Image
+                      source={{
+                        uri: item.result.header_image_url,
+                      }}
+                      style={styles.imageStyle}
+                    />
+                  </View>
                   <Text
                     style={{
-                      fontFamily: "Abel_400Regular",
+                      fontFamily: "Abel",
                       fontSize: 22,
                       marginBottom: 10,
                       textAlign: "center",
+                      color: textColor,
+                      paddingHorizontal: 10,
                     }}
                   >
                     {item.result.title}
@@ -121,7 +204,7 @@ export default function App() {
           />
         </View>
 
-        <View
+        <LinearGradient
           style={{
             marginTop: 0,
             marginBottom: 15,
@@ -130,12 +213,13 @@ export default function App() {
             width: Dimensions.get("window").width,
             justifyContent: "flex-start",
             alignItems: "center",
-            height: 700,
+            height: 690,
             backgroundColor: "white",
             zIndex: 99,
-            transform: [{ translateY: 600 }],
-            paddingTop: 30,
+            transform: [{ translateY: 569 }],
+            paddingTop: 40,
           }}
+          colors={["rgba(235, 235, 235, 0.8)", "black"]}
         >
           <TextInput
             onChangeText={(value) => setRapper(value)}
@@ -155,14 +239,14 @@ export default function App() {
               paddingVertical: 10,
               paddingHorizontal: 90,
               borderRadius: 3,
-              fontFamily: "Abel_400Regular",
+              fontFamily: "Abel",
               fontSize: 25,
             }}
             placeholder="Drake"
             placeholderTextColor="gray"
             onSubmitEditing={(value) => pullRapper(value.nativeEvent.text)}
           />
-        </View>
+        </LinearGradient>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
@@ -171,13 +255,13 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "rgba(235, 235, 235, 0.8)",
     alignItems: "center",
-    justifyContent: "space-around",
+    justifyContent: "flex-start",
   },
   gridView: {
-    marginTop: -70,
+    // marginTop: -70,
     flex: 1,
   },
-  imageStyle: { height: 120, width: 120 },
+  imageStyle: { height: 120, width: 120, borderRadius: 10 },
 });
