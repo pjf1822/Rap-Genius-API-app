@@ -20,7 +20,7 @@ export default function App() {
   const [data, setData] = useState([]);
   const [rapper, setRapper] = useState("drake");
   const [switchFlip, setSwitchFlip] = useState(true);
-  let fontStuff = useFonts({
+  let [loaded] = useFonts({
     Abel_400Regular,
   });
 
@@ -35,15 +35,15 @@ export default function App() {
   };
 
   useEffect(() => {
-    setData(dataStuff);
-    // axios
-    //   .request(options)
-    //   .then(function (response) {
-    //     setData(response.data.response.hits);
-    //   })
-    //   .catch(function (error) {
-    //     console.error(error);
-    //   });
+    // setData(dataStuff);
+    axios
+      .request(options)
+      .then(function (response) {
+        setData(response.data.response.hits);
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
   }, [switchFlip]);
 
   // rerun api pull
@@ -64,6 +64,7 @@ export default function App() {
           style={{
             fontFamily: "Abel_400Regular",
             fontSize: 30,
+            marginTop: -10,
           }}
         >
           {artistName}
@@ -109,6 +110,7 @@ export default function App() {
                       fontFamily: "Abel_400Regular",
                       fontSize: 22,
                       marginBottom: 10,
+                      textAlign: "center",
                     }}
                   >
                     {item.result.title}
@@ -174,7 +176,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   gridView: {
-    marginTop: -40,
+    marginTop: -70,
     flex: 1,
   },
   imageStyle: { height: 120, width: 120 },
