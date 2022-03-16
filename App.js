@@ -21,7 +21,7 @@ export default function App() {
   const [switchFlip, setSwitchFlip] = useState(true);
 
   let [loaded] = useFonts({
-    // Abel_400Regular,
+    Abel_400Regular,
     Abel: require("./fonts/Abel-Regular.ttf"),
   });
 
@@ -36,15 +36,15 @@ export default function App() {
   };
 
   useEffect(() => {
-    setData(dataStuff);
-    // axios
-    //   .request(options)
-    //   .then(function (response) {
-    //     setData(response.data.response.hits);
-    //   })
-    //   .catch(function (error) {
-    //     console.error(error);
-    //   });
+    // setData(dataStuff);
+    axios
+      .request(options)
+      .then(function (response) {
+        setData(response.data.response.hits);
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
   }, [switchFlip]);
 
   // rerun api pull
@@ -63,7 +63,7 @@ export default function App() {
       <SafeAreaView style={styles.container}>
         <Text
           style={{
-            fontFamily: "Abel",
+            fontFamily: "Abel_400Regular",
             fontSize: 32,
             marginTop: 20,
             marginBottom: 20,
@@ -99,7 +99,6 @@ export default function App() {
                   : randomColor.length === 5
                   ? `${randomColor}55`
                   : randomColor;
-              // console.log(randomColorFix.slice(0, -1).length);
 
               // invertColor //
 
@@ -188,7 +187,7 @@ export default function App() {
                   </View>
                   <Text
                     style={{
-                      fontFamily: "Abel",
+                      fontFamily: "Abel_400Regular",
                       fontSize: 22,
                       marginBottom: 10,
                       textAlign: "center",
@@ -239,7 +238,7 @@ export default function App() {
               paddingVertical: 10,
               paddingHorizontal: 90,
               borderRadius: 3,
-              fontFamily: "Abel",
+              fontFamily: "Abel_400Regular",
               fontSize: 25,
             }}
             placeholder="Drake"
@@ -260,7 +259,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   gridView: {
-    // marginTop: -70,
     flex: 1,
   },
   imageStyle: { height: 120, width: 120, borderRadius: 10 },
