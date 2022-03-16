@@ -84,8 +84,14 @@ export default function App() {
             data={data}
             spacing={0}
             fixed
-            style={[styles.gridView, {}]}
-            renderItem={({ item, index }) => {
+            style={styles.gridView}
+            renderItem={({ item }) => {
+              //
+              //
+              // COLOR LOGIC START
+              //
+              //
+
               // randomColor
               const randomColor = `#${Math.floor(
                 Math.random() * 16777215
@@ -147,6 +153,12 @@ export default function App() {
               };
 
               const textColor = getContrast(randomColorFix);
+
+              //
+              //
+              // COLOR LOGIC END
+              //
+              //
 
               return (
                 <View
